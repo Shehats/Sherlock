@@ -23,5 +23,5 @@ class DeleteRequest<T>(
         url: String,
         listener: Response.Listener<JSONObject>,
         errorListener: Response.ErrorListener,
-        data: T?
+        data: T? = null
 ): JsonObjectRequest(Method.DELETE, url, if (data != null) JSONObject(Gson().toJson(data)) else null, listener, errorListener)

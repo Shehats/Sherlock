@@ -6,32 +6,40 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
+import com.android.volley.Response
+import com.sherlock.watson.models.Todo
+import com.sherlock.watson.util.ApiController
+import com.sherlock.watson.util.ApiUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
+    var apiUtils: ApiUtils? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
-
+        this.apiUtils = ApiUtils(this)
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
-
         nav_view.setNavigationItemSelectedListener(this)
+        var apiController: ApiController<Todo> = ApiController(this.apiUtils!!, Todo::class.java)
+        apiController.getAll("https://jsonplaceholder.typicode.com/todos", Response.Listener {
+            response -> var text = findViewById<TextView>(R.id.data)
+            text.setText(response[1].title) }, Response.ErrorListener { error -> error.printStackTrace()})
     }
 
-    override fun onBackPressed() {
+   override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
